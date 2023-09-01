@@ -14,13 +14,17 @@ Projects > 기존 프로젝트 선택 (없다면 Create New Project) > Upload �
 Object Detection으로 타입 설정후 나머지 내용은 임의로 작성
 
 ### Universe 에서 가져오기
-
 - Object Detection 타입 클릭후 데이터셋 선택
 - Image 메뉴 선택
-- Clone Image 선택
+![](./img/Load-From-Universe-1.png?raw=true)
+- 원하는 이미지 선택
+- Clone xx Selected Image 선택
+![](./img/Load-From-Universe-2.png?raw=true)
+![](./img/Load-From-Universe-3.png?raw=true)
 - 담기 원하는 프로젝트 선택
-- Annotated 옵션 선택
-- Clone!
+![](./img/Load-From-Universe-4.png?raw=true)
+- Import Images And Annotations 옵션 선택
+- Finish Cloning XX Images 선택
 
 ## 2. 라벨링 방법
 
@@ -31,17 +35,38 @@ Object Detection으로 타입 설정후 나머지 내용은 임의로 작성
 Annotation을 수동으로 진행할 수 있는 기능으로 다음이 있음
 
 #### Bounding Box Tool
+![](./img/Label-Hand-1.png?raw=true)
+수동으로 바운딩 박스를 세팅하는 기능
+드래그해서 선택 후 라벨링 지정
+
+
 #### Polygon Tool
+![](./img/Label-Hand-2.png?raw=true)
+수동으로 세그멘테이션을 세팅하는 기능
+포인트들 클릭 후 다시 원점 까지 눌러서 폐곡선 생성 후 라벨링 지정
+
 #### Smart Polygon Tool
+![](./img/Label-Hand-4.png?raw=true)
+![](./img/Label-Hand-3.png?raw=true)
+클릭한 이미지 기준으로 자동으로 부분 잡아오는 기능
+부분 지정 후 라벨링 지정
 
 ### 2) 자동 - Universe에 있는 모델 이용하여 Annotation
 
 #### Label Assistant Tool
 
-* Universe 에서 Model Tag 붙어있는 데이터 페이지 진입 후
-* Star Check
-* Annotator 로 들어가면 해당 모델 체크가능
+
+* 먼저 Universe 에서 Model Tag 붙어있는 데이터 페이지 진입
+![](./img/Label-Auto-With-Model-1.png?raw=true)
+* 모델이름 왼쪽에 별모양 Star 클릭하여 check
+![](./img/Label-Auto-With-Model-2.png?raw=true)
+* Annotator 에서 Label Assist 클릭 후
+![](./img/Label-Auto-With-Model-3.png?raw=true)
+![](./img/Label-Auto-With-Model-4.png?raw=true)
+* public 모델 선택 후 본인이 Star 누른 모델 중 선택
+![](./img/Label-Auto-With-Model-5.png?raw=true)
 * 해당 모델 선택 후 검출할 클래스 취사선택 가능
+![](./img/Label-Auto-With-Model-6.png?raw=true)
 * Let's Annotate 클릭
 
 ### 3) 여러 데이터셋 합치기
@@ -164,8 +189,10 @@ names: ['Fire', 'Smoke', 'Human']
 
 #### 2 - 로보플로우
 
-합치고자 하는 아무 프로젝트 한 개에 점 세 개 클릭 후 Merge Project
-합칠 프로젝트 추가 후 Merge 클릭
+![](./img/Merge-1.png?raw=true)
+* 합치고자 하는 아무 프로젝트 한 개에 점 세 개 클릭 후 Merge Project
+![](./img/Merge-2.png?raw=true)
+* 합칠 프로젝트 추가 후 Merge 클릭
 
 ### 4) 임의의 라벨링 추가
 
