@@ -202,12 +202,70 @@ names: ['Fire', 'Smoke', 'Human']
 
 ### 1) Roboflow 내에서 활용
 
-### 2) User Define 학습
+![](./img/Roboflow-Train-1.png?raw=true)
+* 어노테이션 완료된 프로젝트에서 Generate 클릭
+![](./img/Roboflow-Train-2.png?raw=true)
+* 소스 이미지 확인 (필요없거나 육안으로 품질 안좋은 이미지 제거해주시면 좋습니다)
+![](./img/Roboflow-Train-3.png?raw=true)
+* Train/Validation/Test Set 분리
+![](./img/Roboflow-Train-4.png?raw=true)
+* Rebalance 통해서 다르게 분배도 가능
+![](./img/Roboflow-Train-5.png?raw=true)
+* PreProcessing - 자동으로 회전된 이미지나 사이즈 크기 변경을 전처리
+![](./img/Roboflow-Train-6.png?raw=true)
+* 이외에도 다른 전처리도 가능 (유료기능인 것들은 화살표 표시)
+![](./img/Roboflow-Train-7.png?raw=true)
+* Augmentation의 경우 데이터셋이 모자라거나 여러 데이터를 이용할 수 있게 하기 위해 데이터셋의 이미지를 강제로 변형시키는 
+* 여러 변형을 적용해 볼 수 있음 (유료기능인 것들은 화살표 표시)
+![](./img/Roboflow-Train-8.png?raw=true)
+![](./img/Roboflow-Train-9.png?raw=true)
+* Generate를 누르고 Train With Roboflow 버튼을 눌러 모델 생성
+![](./img/Roboflow-Train-10.png?raw=true)
+* Fast 후 Continue / Accurate 는 유료
+![](./img/Roboflow-Train-11.png?raw=true)
+* 이전에 학습한 체크포인트 (중간 저장 모델) 혹은 퍼블릭으로 공개된 체크포인트로 학습 가능
+![](./img/Roboflow-Train-12.png?raw=true)
+* 학습완료되면 메일 노티와 함께 모델 사용 가능
 
-#### 1 - Local Machine
-     
+### 2) User Define 학습 (YOLO8 기준)
+
+#### 1 - Local Machine (우분투 22버전 기준)
+* 
+
+```
+pip install ultralytics
+```
+를 통해 Yolo8 설치
+
+```
+# check.py
+import ultralytics
+ultralytics.checks()
+```
+해당 코드를 통해 설치 잘 되었는지 확인
+
+```
+from ultralytics import YOLO
+from PIL import Image
+import numpy as np
+
+
+model = YOLO('yolov8n.pt')    
+results = model.predict(source='./test_img_path/*.jpg', save=True)
+for result in results:
+        
+    uniq, cnt = np.unique(result.boxes.cls.cpu().numpy(), return_counts=True)  # Torch.Tensor -> numpy
+    uniq_cnt_dict = dict(zip(uniq, cnt))
+
+    print('\n{class num:counts} =', uniq_cnt_dict,'\n')
+
+    for c in result.boxes.cls:
+        print('class_name =', model.names[int(c)])
+```
+
 #### 2 - Cloud Machine
-     
+* AWS / GCP / Azure 등등에서 머신을 생성하는 데 있어서 Cuda Compatible Image가 포함된 os 설치 필요 
+* 이후 작업은 1번 로컬 머신에서의 학습 방법과 동일     
 
 ## 4. 학습 모델 사용법 / 배포
 
