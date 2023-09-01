@@ -230,31 +230,66 @@ names: ['Fire', 'Smoke', 'Human']
 ### 2) User Define 학습 (YOLO8 기준)
 
 #### 1 - Local Machine (우분투 22버전 기준)
-* 
 
-```
+##### 설치 및 체크
+
+```bash
 pip install ultralytics
 ```
 를 통해 Yolo8 설치
 
-```
+```python
 # check.py
 import ultralytics
 ultralytics.checks()
 ```
 해당 코드를 통해 설치 잘 되었는지 확인
 
+위에서 언급한 모양의 yaml 과 데이터셋을 만들어주고 학습시작
+예시 폴더 구조 형태
 ```
+ Dataset 1
+    ㄴ data.yaml
+    ㄴ train
+       ㄴ image
+       ㄴ labels
+    ㄴ test
+       ㄴ image
+       ㄴ labels
+```
+
+##### 학습
+
+```python
+# train_ex.py
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt')  # load a pretrained YOLOv8n detection model
+model.train(data='/your_data.yaml', epochs=100, patience=30, batch=32, imgsz=416)
+```
+해당 코드를 통해 yaml 파일을 로드해와서 학습 시작
+
+
+#### 2 - Cloud Machine
+
+* AWS / GCP / Azure 등등에서 머신을 생성하는 데 있어서 Cuda Compatible Image가 포함된 os 설치 필요 
+* 이후 작업은 1번 로컬 머신에서의 학습 방법과 동일     
+
+## 4. 학습 모델 사용법 / 추론 (Inference)
+
+아래 코드를 사용
+
+```python
+# run_ex.py
 from ultralytics import YOLO
 from PIL import Image
 import numpy as np
 
 
-model = YOLO('yolov8n.pt')    
-results = model.predict(source='./test_img_path/*.jpg', save=True)
+model = YOLO('yolov8n.pt')  # yolo8모델 다운로드 및 로드 // 커스텀모델 경로 대입
+results = model.predict(source='./test_img_path/*.jpg', save=True) # test_img_path에는 inference 할 파일 경로 대입
 for result in results:
         
-    uniq, cnt = np.unique(result.boxes.cls.cpu().numpy(), return_counts=True)  # Torch.Tensor -> numpy
+    uniq, cnt = np.unique(result.boxes.cls.cpu().numpy(), return_counts=True)
     uniq_cnt_dict = dict(zip(uniq, cnt))
 
     print('\n{class num:counts} =', uniq_cnt_dict,'\n')
@@ -263,18 +298,17 @@ for result in results:
         print('class_name =', model.names[int(c)])
 ```
 
-#### 2 - Cloud Machine
-* AWS / GCP / Azure 등등에서 머신을 생성하는 데 있어서 Cuda Compatible Image가 포함된 os 설치 필요 
-* 이후 작업은 1번 로컬 머신에서의 학습 방법과 동일     
-
-## 4. 학습 모델 사용법 / 배포
-
-## 5. 추론 (Inference)
-
-### Requirements
-
 ### Run (with Params)
+```bash
+python train.py
+```
 
-### Result
+### Result 예시
+```
+{class num:counts} = {0.0: 1, 1.0: 1, 2.0: 2} 
+```
 
 ### MultiModel User
+
+* 각 모델별로 run_ex.py를 만들되 model.predict의 파라미터중 device에 gpu id 대입
+* gpu id는 nvidia-smi 명령어를 통해 가능
