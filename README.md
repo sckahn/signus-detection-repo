@@ -312,3 +312,105 @@ python train.py
 
 * 각 모델별로 run_ex.py를 만들되 model.predict의 파라미터중 device에 gpu id 대입
 * gpu id는 nvidia-smi 명령어를 통해 가능
+
+
+## 5. 학습모델 학습 및 모델 저장 및 사용 예제
+
+보내주신 data.yaml 을 기준으로 예시를 작성해보면
+
+
+```
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 13
+names: ['car-parking-lot_1', 'car-parking-lot_2', 'ev6_back_in', 'ev6_back_rearlamp', 'ev6_back_rearlamp_left', 'ev6_back_rearlamp_right', 'ev6_back_rearspoiler', 'ev6_pull_in', 'ioniq5_back_in', 'ioniq5_back_rearlamp', 'ioniq5_back_rearlamp_left', 'ioniq5_back_rearlamp_right', 'ioniq5_pull_in']
+
+roboflow:
+  workspace: signus
+  project: cm1-tvrm0
+  version: 1
+  license: CC BY 4.0
+  url: https://app.roboflow.com/signus/cm1-tvrm0/1
+
+```
+
+이 데이터 셋을 그대로 학습모델에 적용할 경우
+
+위으 3.3 코드를 응용하여 아래의 코드를 실행
+
+
+```python
+# train_ex.py
+from ultralytics import YOLO
+model = YOLO('yolov8n.pt') ## 이 부분은 실제 yolov8n.pt 파일이 존재하지 않는 경우에는 웹에서 다운받아옴
+
+# data.yaml 기준으로 학습
+model.train(data='{data.yaml 경로}', epochs=100, patience=30, batch=32, imgsz=416)
+
+## 저장 코드 추가
+model.export()
+```
+
+저장된 모델은 run이라는 경로에 epoch마다 저장
+생성된 파일중 제일 마지막 epoch에 weight폴더에 있는 best.pt 사용 권장
+
+Ex. ![](./img/SaveModel.png?raw=true)
+
+
+
+
+만약 위와 같이 학습 후 추후에 현재 학습데이터에 라벨과 이미지 추가를 하고 싶을 경우는 아래와 같은 두 경우로 나뉨
+
+1. 로보플로우의 같은 데이터셋에 라벨과 이미지 추가
+2. 로보플로우의 다른 데이터셋의 라벨과 이미지 추가
+
+1번의 경우에는 그냥 위의 예제대로 진행하면 되지만
+2번의 경우는 2.3)-1 의 프로그래밍적 방법에서 서술한대로 작업 필요
+
+이를 위해 change.py 라는 소스 작성하여 첨부함.
+change.py 는 라벨 텍스트의 첫 숫자를 바꿔주는 파이썬 함수로 작성되었으며
+2번 경우와 같이 다른 데이터셋을 가져와 위의 data.yaml에 넣는 경우에는
+
+만약 아래에 새로운 데이터셋 'people'을 추가 한다 가정하면
+
+기존의 data.yaml은 아래와 같고
+
+```
+nc: 13
+names: ['car-parking-lot_1', 'car-parking-lot_2', 'ev6_back_in', 'ev6_back_rearlamp', 'ev6_back_rearlamp_left', 'ev6_back_rearlamp_right', 'ev6_back_rearspoiler', 'ev6_pull_in', 'ioniq5_back_in', 'ioniq5_back_rearlamp', 'ioniq5_back_rearlamp_left', 'ioniq5_back_rearlamp_right', 'ioniq5_pull_in']
+```
+
+다른 데이터 셋의 data.yaml 은 이렇다 가정하면
+
+```
+nc: 1
+names: ['people']
+```
+
+둘을 합치게 되면 아래와 같아짐
+
+
+```
+nc: 14
+names: ['car-parking-lot_1', 'car-parking-lot_2', 'ev6_back_in', 'ev6_back_rearlamp', 'ev6_back_rearlamp_left', 'ev6_back_rearlamp_right', 'ev6_back_rearspoiler', 'ev6_pull_in', 'ioniq5_back_in', 'ioniq5_back_rearlamp', 'ioniq5_back_rearlamp_left', 'ioniq5_back_rearlamp_right', 'ioniq5_pull_in', 'people']
+```
+
+이 경우에 change.py 를 이용하여 추가한다 가정하면
+people은 기존 데이터셋에선 0번 클래스 인덱스를 가지지만 이제 13번 인덱스를 가지게 되므로 change.py를 아래와 같이 수정하여 실행하고 
+
+```
+path = "모델 파일 경로"
+    
+    dirs.append(path + "/train/labels")    
+    dirs.append(path + "/valid/labels")    
+    dirs.append(path + "/test/labels")    
+    
+
+    from = 0 
+    to = 13   
+```
+
+
+기존 people dataset에 있던 train, valid, test 폴더에 있던 images 와 labels 하위의 파일들을 기존 데이터셋 폴더에 추가하여주면 됨
